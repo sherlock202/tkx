@@ -158,9 +158,10 @@ class Food:
         self.y = random.randint(0, SCREEN_HEIGHT - 15) # Ensure food is fully visible
         self.size = 15
         self.color = (0, 255, 0)  # Green
+        self.rect = pygame.Rect(self.x, self.y, self.size, self.size)
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+        pygame.draw.rect(screen, self.color, self.rect)
 
 # Create a Food instance
 food = Food()
@@ -301,7 +302,7 @@ while running:
 
     # Draw the ant and the food
     ant.draw(screen)
-    food.draw(screen) 
+    food.draw(screen) # Food's draw method now uses self.rect
 
     # Display Game Over message and score if game is over
     if game_over:
