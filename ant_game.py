@@ -94,30 +94,33 @@ class Ant:
     def __init__(self, food_obj): 
         self.food_obj = food_obj
         
-        # Load ant sprite
-        try:
-            self.original_image = pygame.image.load("ant_sprite.png").convert_alpha()
-        except pygame.error as e:
-            print(f"Error loading ant_sprite.png: {e}")
-            # Fallback to a simple square if image loading fails
-            self.original_image = pygame.Surface((24, 24), pygame.SRCALPHA)
-            pygame.draw.rect(self.original_image, (0,0,0), (0,0,24,24)) # Black square
-            pygame.draw.line(self.original_image, (255,0,0), (12,0), (12,5), 2) # Red line for front
+        # Procedural Ant Sprite Creation
+        ant_width = 20
+        ant_height = 20 # Using a square for simplicity, can be adjusted
+        self.original_image = pygame.Surface((ant_width, ant_height), pygame.SRCALPHA)
+        
+        # Ant body (e.g., a filled ellipse or rectangle)
+        # For simplicity, a filled rectangle as the body
+        pygame.draw.rect(self.original_image, (0, 0, 0), (0, 0, ant_width, ant_height)) # Black body
+        
+        # Feature for direction (e.g., a red line at the "front" - assuming top is front before rotation)
+        # Line from center-top towards top edge
+        front_indicator_start = (ant_width // 2, ant_height // 4) 
+        front_indicator_end = (ant_width // 2, 0)
+        pygame.draw.line(self.original_image, (255, 0, 0), front_indicator_start, front_indicator_end, 3) # Red line, 3px thick
 
         self.image = self.original_image # This is the surface that gets rotated and drawn
         
-        # Initial position - center the ant sprite if possible, or use random topleft
-        initial_x = random.randint(0, SCREEN_WIDTH - self.image.get_width())
-        initial_y = random.randint(0, SCREEN_HEIGHT - self.image.get_height())
-        self.rect = self.image.get_rect(topleft=(initial_x, initial_y))
+        # Initial position: Randomly place the ant's center on the screen
+        # Ensure the entire sprite is within bounds based on its initial rect.
+        # self.x and self.y will be the logical center.
+        self.x = float(random.randint(ant_width // 2, SCREEN_WIDTH - ant_width // 2))
+        self.y = float(random.randint(ant_height // 2, SCREEN_HEIGHT - ant_height // 2))
         
-        # self.x and self.y will now refer to the center of the ant for smoother rotation/movement logic
-        self.x = float(self.rect.centerx) 
-        self.y = float(self.rect.centery)
+        self.rect = self.image.get_rect(center=(int(self.x), int(self.y)))
 
         self.speed = 2.0 
         self.random_strength = 0.3 # Original random strength, will be scaled down in update_movement
-        # self.seeking_strength is implicitly 1.0 for food attraction in the new model.
 
     def update_movement(self, obstacles_list):
         ant_center_x, ant_center_y = self.rect.centerx, self.rect.centery
